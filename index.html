@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+<meta name="theme-color" content="#128c7e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Point WhatsApp</title>
+<style>
+:root{--bg:#f4f6f5;--card:#fff;--tx:#14211c;--mut:#667;--pri:#128c7e;--bd:#dde3e0;--bad:#c0392b;--ok:#1b8a4b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1714;--card:#18231f;--tx:#e8efec;--mut:#92a39c;--bd:#2a3a34;--bad:#ff7b6b;--ok:#4fd387}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.4 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;padding-bottom:70px}
+header{background:var(--pri);color:#fff;padding:12px 14px;font-weight:700;font-size:17px;position:sticky;top:env(safe-area-inset-top,0px);z-index:5}
+main{padding:12px;max-width:640px;margin:auto}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px}
+label{display:block;font-size:12px;color:var(--mut);margin:8px 0 3px}
+input,select,textarea{width:100%;padding:10px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+button{border:0;border-radius:10px;padding:11px 14px;font:inherit;font-weight:600;background:var(--pri);color:#fff;cursor:pointer}
+button.s{background:var(--bd);color:var(--tx)}button.d{background:var(--bad)}
+.btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.btns button{flex:1}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;background:none;color:var(--mut);border-radius:0;padding:12px 4px;font-size:13px}
+nav button.on{color:var(--pri);box-shadow:inset 0 2px 0 var(--pri)}
+.big{font-size:20px;font-weight:700}.pos{color:var(--ok)}.neg{color:var(--bad)}
+pre{white-space:pre-wrap;background:var(--bg);border:1px solid var(--bd);border-radius:8px;padding:10px;font:13px/1.4 ui-monospace,monospace;margin:8px 0 0}
+.it{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd)}
+.it:last-child{border:0}.mut{color:var(--mut);font-size:12px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<header><img src="icon-192.png" alt="" width="28" height="28" style="border-radius:7px;vertical-align:middle;margin-right:8px">Point des établissements</header>
+<main>
+<section id="t-point">
+ <div class="card">
+  <div class="row"><div><label>Établissement</label><select id="etab"></select></div>
+  <div><label>Date</label><input type="date" id="date"></div></div>
+  <div class="row"><div><label id="lesp">Ventes espèces (FCFA)</label><input type="number" inputmode="numeric" id="esp"></div>
+  <div><label>Orange Money</label><input type="number" inputmode="numeric" id="om"></div></div>
+  <div class="row"><div><label>Wave</label><input type="number" inputmode="numeric" id="wv"></div>
+  <div><label>Dépenses</label><input type="number" inputmode="numeric" id="dep"></div></div>
+  <div class="row"><div><label>Argent remis</label><input type="number" inputmode="numeric" id="rem"></div>
+  <div><label>Bouteilles entrées</label><input type="number" inputmode="numeric" id="ent"></div></div>
+  <label>Motif des dépenses / remarques</label><textarea id="note" rows="2"></textarea>
+ </div>
+ <div class="card">
+  <div class="mut" id="ltot">Total ventes</div><div class="big" id="tot">0 FCFA</div>
+  <div class="mut" style="margin-top:6px">Espèces restantes (espèces − dépenses − remis)</div><div class="big" id="rest">0 FCFA</div>
+  <pre id="msg"></pre>
+  <div class="btns"><button id="wa">Envoyer sur WhatsApp</button><button class="s" id="cp">Copier</button></div>
+  <div class="btns"><button class="s" id="sv">Enregistrer</button><button class="s hide" id="grp">Ouvrir le groupe</button></div>
+ </div>
+</section>
+<section id="t-recap" class="hide">
+ <div class="card"><label>Date du récapitulatif</label><input type="date" id="rdate">
+ <pre id="rmsg"></pre>
+ <div class="btns"><button id="rwa">Envoyer sur WhatsApp</button><button class="s" id="rcp">Copier</button></div></div>
+ <div class="card"><b>Historique</b><div id="hist"></div></div>
+</section>
+<section id="t-set" class="hide">
+ <div class="card"><b>Établissements</b><div id="elist"></div>
+  <label>Nouvel établissement</label><input id="nn" placeholder="Nom">
+  <div class="btns"><button id="add">Ajouter</button></div></div>
+ <div class="card"><b>Données</b>
+  <div class="btns"><button class="s" id="exp">Exporter</button><button class="s" id="imp">Importer</button><button class="s" id="inst">Installer l’appli</button></div>
+  <input type="file" id="file" accept=".json" class="hide">
+  <p class="mut">WhatsApp ne permet pas d’ouvrir un groupe précis avec un message prêt : le bouton « Envoyer » ouvre WhatsApp avec le texte, vous choisissez le groupe. Collez le lien d’invitation de chaque groupe pour l’ouvrir en un clic.</p></div>
+</section>
+</main>
+<nav><button data-t="point" class="on">✏️ Point</button><button data-t="recap">📊 Récap</button><button data-t="set">⚙️ Réglages</button></nav>
+<script>
+const $=id=>document.getElementById(id);
+let S={etabs:[{n:"RUES DES STARS",g:""},{n:"Primature 1",g:""},{n:"Primature 3",g:""},{n:"Primature 7",g:""},{n:"Pergola",g:""},{n:"Lavage auto Pergola",g:""},{n:"Lavage auto Primature 1",g:""},{n:"Hôtel Pergola",g:""}],pts:{}};
+try{const x=localStorage.getItem("pw");if(x)S=JSON.parse(x)}catch(e){}
+const save=()=>{try{localStorage.setItem("pw",JSON.stringify(S))}catch(e){}};
+const today=()=>{const d=new Date();return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)};
+const fm=n=>(Math.round(n)||0).toLocaleString("fr-FR").replace(/[\u202f\u00a0]/g," ");
+const v=id=>+$(id).value||0;
+const fd=d=>d.split("-").reverse().join("/");
+const key=()=>$("date").value+"|"+$("etab").value;
+const isR=n=>/lavage|h[oô]tel/i.test(n);function line(p,n,d){const tot=p.esp+p.om+p.wv,r=p.esp-p.dep-p.rem;
+return `📍 *${n}* — ${fd(d)}\n💰 Espèces : ${fm(p.esp)}\n📱 Orange : ${fm(p.om)} | Wave : ${fm(p.wv)}\n✅ Total ${isR(n)?"recette":"ventes"} : ${fm(tot)} FCFA\n🧾 Dépenses : ${fm(p.dep)}${p.note?" ("+p.note+")":""}\n🤝 Remis : ${fm(p.rem)}\n💵 Reste espèces : ${fm(r)} FCFA${isR(n)?"":"\n📦 Bouteilles entrées : "+p.ent}`}
+function cur(){return{esp:v("esp"),om:v("om"),wv:v("wv"),dep:v("dep"),rem:v("rem"),ent:v("ent"),note:$("note").value.trim()}}
+function calc(){const p=cur();const R=isR($("etab").value);$("ent").parentElement.classList.toggle("hide",R);$("lesp").textContent=R?"Recette espèces (FCFA)":"Ventes espèces (FCFA)";$("ltot").textContent=R?"Total recette":"Total ventes";$("tot").textContent=fm(p.esp+p.om+p.wv)+" FCFA";const r=p.esp-p.dep-p.rem;$("rest").textContent=fm(r)+" FCFA";$("rest").className="big "+(r<0?"neg":"pos");
+$("msg").textContent=line(p,$("etab").value,$("date").value);const e=S.etabs.find(x=>x.n==$("etab").value);$("grp").classList.toggle("hide",!(e&&e.g))}
+function load(){const p=S.pts[key()]||{esp:"",om:"",wv:"",dep:"",rem:"",ent:"",note:""};
+["esp","om","wv","dep","rem","ent","note"].forEach(k=>$(k).value=p[k]||"");calc()}
+function fillEtabs(){const c=$("etab").value;$("etab").innerHTML=S.etabs.map(e=>`<option>${e.n}</option>`).join("");if(c)$("etab").value=c;
+$("elist").innerHTML=S.etabs.map((e,i)=>`<div class="it"><div style="flex:1"><b>${e.n}</b><input data-i="${i}" class="gl" placeholder="Lien du groupe WhatsApp" value="${e.g||""}"></div><button class="d" data-del="${i}">✕</button></div>`).join("")}
+function wa(t){location.href="https://wa.me/?text="+encodeURIComponent(t)}
+function cp(t,b){navigator.clipboard.writeText(t).then(()=>{b.textContent="Copié ✓";setTimeout(()=>b.textContent="Copier",1500)}).catch(()=>{})}
+function recap(){const d=$("rdate").value;let t=`📋 *POINT GÉNÉRAL* — ${fm(0)&&fd(d)}\n`,T=0,D=0,R=0,found=0;
+S.etabs.forEach(e=>{const p=S.pts[d+"|"+e.n];if(!p)return;found++;const tot=p.esp+p.om+p.wv;T+=tot;D+=p.dep;R+=p.esp-p.dep-p.rem;t+=`\n📍 ${e.n} : ${fm(tot)} (dép. ${fm(p.dep)})`});
+if(!found)t+="\nAucun point saisi.";else t+=`\n\n✅ Total ventes : ${fm(T)} FCFA\n🧾 Total dépenses : ${fm(D)}\n💵 Reste espèces : ${fm(R)} FCFA`;
+$("rmsg").textContent=t;
+const ds=[...new Set(Object.keys(S.pts).map(k=>k.split("|")[0]))].sort().reverse().slice(0,14);
+$("hist").innerHTML=ds.map(x=>{let s=0;S.etabs.forEach(e=>{const p=S.pts[x+"|"+e.n];if(p)s+=p.esp+p.om+p.wv});return`<div class="it"><span>${fd(x)}</span><b>${fm(s)} FCFA</b></div>`}).join("")||'<p class="mut">Aucun historique.</p>'}
+$("date").value=$("rdate").value=today();fillEtabs();load();recap();
+["etab","date"].forEach(i=>$(i).onchange=load);
+["esp","om","wv","dep","rem","ent","note"].forEach(i=>$(i).oninput=calc);
+$("rdate").onchange=recap;
+$("wa").onclick=()=>{$("sv").click();wa($("msg").textContent)};
+$("cp").onclick=e=>cp($("msg").textContent,e.target);
+$("sv").onclick=e=>{S.pts[key()]=cur();save();recap();e.target.textContent="Enregistré ✓";setTimeout(()=>e.target.textContent="Enregistrer",1500)};
+$("grp").onclick=()=>{const e=S.etabs.find(x=>x.n==$("etab").value);if(e&&e.g)window.open(e.g,"_blank")};
+$("rwa").onclick=()=>wa($("rmsg").textContent);
+$("rcp").onclick=e=>cp($("rmsg").textContent,e.target);
+$("add").onclick=()=>{const n=$("nn").value.trim();if(n&&!S.etabs.some(e=>e.n==n)){S.etabs.push({n,g:""});save();$("nn").value="";fillEtabs();load();recap()}};
+$("elist").onclick=e=>{const i=e.target.dataset.del;if(i!==undefined&&confirm("Supprimer cet établissement de la liste ?")){S.etabs.splice(+i,1);save();fillEtabs();load();recap()}};
+$("elist").onchange=e=>{if(e.target.classList.contains("gl")){S.etabs[+e.target.dataset.i].g=e.target.value.trim();save();calc()}};
+$("exp").onclick=()=>{const a=document.createElement("a");a.href="data:application/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(S));a.download="point-whatsapp.json";a.click()};
+$("imp").onclick=()=>$("file").click();
+$("file").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{S=JSON.parse(r.result);save();fillEtabs();load();recap()}catch(x){alert("Fichier invalide")}};r.readAsText(f)};
+let dp;addEventListener("beforeinstallprompt",e=>{e.preventDefault();dp=e});
+$("inst").onclick=()=>dp?dp.prompt():alert("Menu du navigateur → « Ajouter à l’écran d’accueil » ou « Installer ».");
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>{document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("on",x==b));["point","recap","set"].forEach(t=>$("t-"+t).classList.toggle("hide",t!=b.dataset.t));if(b.dataset.t=="recap")recap()});
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script>
+</body>
+</html>
